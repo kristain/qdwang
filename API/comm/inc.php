@@ -1,0 +1,1 @@
+{"appid":"100559735","appkey":"a130f19d00d8fb2549ac29072b73e985","callback":"http://pfd8.com/lyhpfb/example/oauth/callback.php","scope":"get_user_info,get_info","errorReport":true,"storageType":"file","host":"localhost","user":"root","password":"root","database":"test"}

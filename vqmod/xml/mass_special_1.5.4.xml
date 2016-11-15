@@ -1,0 +1,190 @@
+<modification>
+  <id>Mass special</id>
+  <version>1.0</version>
+  <vqmver>2.3.2</vqmver>
+  <author>www.cengizonkal.com</author>
+<file name="admin/language/english/english.php">
+  <operation>
+    <search position="after"><![CDATA[
+    $_['button_copy']
+    ]]></search>
+    <add trim="true"><![CDATA[
+    $_['text_customer_group']      = '客户分类';  
+    $_['text_ok']      = '确定';
+    $_['text_percentage']          = '百分比';
+    $_['text_value']          = '值';
+    $_['text_all']          = '所有';
+    $_['text_start_date']          = '开始日期';
+    $_['text_end_date']          = '截止日期';
+    $_['text_discount']          = '优惠';
+    $_['text_type']          = '对应商品分类';
+    $_['text_category']          = '商品分类';
+    $_['text_sure']          = '确定所有的特价商品会被删除!';
+    $_['text_mass_discount']          = 批量折扣';
+    
+    ]]></add>
+  </operation>
+</file>
+
+<file name="admin/controller/catalog/product.php">
+  <operation>
+    <search position="before"><![CDATA[     
+    public function autocomplete() {
+    ]]></search>
+    <add trim="true"><![CDATA[
+  public function discountAll() {
+    $this->load->language('catalog/product');
+    $this->document->setTitle($this->language->get('heading_title')); 
+    $this->load->model('catalog/product');
+    
+    $products = array();
+    
+    if($this->request->post['category_id'] != -1 ) {
+      $products = $this->model_catalog_product->getProducts(array('filter_category_id' => $this->request->post['category_id']));
+    }else {
+      $products = $this->model_catalog_product->getProducts();
+    }
+
+
+    foreach($products as $product) {
+      $price = 0;
+      if($this->request->post['type'] == 1) {
+        $price = (float)((float)$product['price'] - (float) $this->request->post['discount']);
+      }elseif ($this->request->post['type'] == 2) {
+        $price = (float)((float)$product['price'] - ((float)$product['price'] * (float) $this->request->post['discount'])/100);
+      }
+      
+      $this->db->query("DELETE FROM " . DB_PREFIX . "product_special where product_id = '".(int)$product['product_id']."'");
+      if(($price > 0) && ($price != $product['price'])) {
+        $this->db->query("INSERT INTO " . DB_PREFIX . "product_special(product_id, customer_group_id, price, date_start, date_end) VALUES('" . (int)$product['product_id'] . "','". (int)$this->request->post['customer_group_id'] ."','" . (float)$price . "','".$this->request->post['date_start']."','".$this->request->post['date_end']."')");
+      }
+      $this->cache->delete('product');
+    }
+    
+    $this->getList();
+  }
+  
+    ]]></add>
+  </operation>
+
+<operation>
+    <search position="after"><![CDATA[     
+    $this->data['pagination'] = $pagination->render();
+    ]]></search>
+    <add trim="true"><![CDATA[
+      $this->load->model('catalog/category');
+      $this->data['categories'] = $categories = $this->model_catalog_category->getCategories(0);
+      $this->load->model('sale/customer_group');
+      $this->data['customer_groups'] = $this->model_sale_customer_group->getCustomerGroups();  
+  
+    ]]></add>
+  </operation>
+
+  <operation>
+    <search position="after"><![CDATA[$this->data['delete'] = $this->url->link('catalog/product/delete', 'token=' . $this->session->data['token'] . $url, 'SSL');]]></search>
+    <add trim="true"><![CDATA[
+    $this->data['discount'] = $this->url->link('catalog/product/discountAll', 'token=' . $this->session->data['token'] . $url, 'SSL');  
+    ]]></add>
+  </operation>
+  <operation>
+    <search position="after"><![CDATA[
+    $this->data['button_delete'] = $this->language->get('button_delete');
+    ]]></search>
+    <add trim="true"><![CDATA[
+    $this->data['text_percentage'] = $this->language->get('text_percentage');
+    $this->data['text_value'] = $this->language->get('text_value');
+    $this->data['text_ok'] = $this->language->get('text_ok');
+    $this->data['text_all'] = $this->language->get('text_all');
+    $this->data['text_start_date'] = $this->language->get('text_start_date');
+    $this->data['text_end_date'] = $this->language->get('text_end_date');
+    $this->data['text_discount'] = $this->language->get('text_discount');
+    $this->data['text_category'] = $this->language->get('text_category');
+    $this->data['text_type'] = $this->language->get('text_type');
+    $this->data['text_sure'] = $this->language->get('text_sure');
+    $this->data['text_mass_discount'] = $this->language->get('text_mass_discount');
+    $this->data['text_customer_group'] = $this->language->get('text_customer_group');
+    
+    
+    ]]></add>
+  </operation>
+  
+</file>
+
+<file name="admin/view/template/catalog/product_list.tpl">
+  <operation>
+    <search position="before"><![CDATA[
+    <div class="heading">
+    ]]></search>
+    <add trim="true"><![CDATA[
+    <div class="heading">
+      <h1><?php echo $text_mass_discount;?></h1>
+    </div>
+    <div class="content" style="min-height:60px!important;margin-bottom:25px">
+      <form id="frm-mass-discount" action="<?php echo $discount; ?>" method="post">
+      <table>
+      <thead>
+        <tr>
+        <td><?php echo $text_customer_group;?></td>
+        <td><?php echo $text_start_date;?></td>
+        <td><?php echo $text_end_date;?></td>
+        <td><?php echo $text_discount;?></td>
+        <td><?php echo $text_type;?></td>
+        <td><?php echo $text_category;?></td>
+        <td></td>
+        </tr>
+      </thead>
+      <tr>
+      <td>
+        <select name="customer_group_id"  >        
+          <?php 
+            foreach($customer_groups as $cus){         
+              echo '<option value="'.$cus['customer_group_id'].'">'.$cus['name'].'</option>';
+            }
+          ?>        
+        </select>
+      </td>
+      <td><input type="text" name="date_start" value="0000-00-00" class="date"></td>
+          <td><input type="text" name="date_end" value="0000-00-00" class="date"></td>
+          <td><input type="text" name="discount" id="discount" value="0"/></td>
+          <td><select name="type">
+            <option value="1"><?php echo $text_value;?></option>
+            <option value="2"><?php echo $text_percentage;?></option>
+          </select></td>
+      <td>
+        <select name="category_id"  >        
+          <option value="-1"><?php echo $text_all;?></option>
+          <?php 
+            foreach($categories as $cat){         
+              echo '<option value="'.$cat['category_id'].'">'.$cat['name'].'</option>';
+            }
+          ?>        
+        </select>
+      </td>
+          <td><a class="button" onclick="submitDiscount();"><?php echo $text_ok;?></a></td>
+      </tr>     
+      </table>
+        </form>
+    </div>
+    ]]></add>
+  </operation>
+  <operation>
+    <search position="before"><![CDATA[
+    <?php echo $footer; ?>
+    ]]></search>
+    <add trim="true"><![CDATA[
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $('.date').datepicker({dateFormat: 'yy-mm-dd'});  
+      })
+      function submitDiscount() {
+        if(confirm('<?php echo $text_sure;?>')){
+          $('#frm-mass-discount').submit();
+        }
+        
+      }
+      
+    </script>
+    ]]></add>
+  </operation>
+</file>
+</modification>

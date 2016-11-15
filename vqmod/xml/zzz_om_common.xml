@@ -1,0 +1,59 @@
+<modification>
+    <id>OpenCart Mobile Framework</id>
+	<version>v2.2.0</version>
+    <vqmver>2.4.1</vqmver>
+    <author>omframework.com / braiv.com</author>	
+	
+	<file name="system/startup.php">
+		<operation>
+			<search position="before">
+			<![CDATA[?>]]></search>
+			<add><![CDATA[
+			
+//Mobile Esp detection library
+require_once(DIR_SYSTEM . 'library/categorizr.php');
+			]]></add>
+		</operation>
+	</file>	
+	
+	<!-- This is where the magic happens :) -->	
+	<file name="system/engine/controller.php">
+		<operation>
+			<search position="before" ><![CDATA[
+			protected function render() {
+			]]></search>
+			<add><![CDATA[
+	protected function isVisitorMobile() {		// Mobile device detection
+
+		$config_mobile_smartphones = $this->config->get('config_mobile_smartphones');
+		$config_mobile_tablets = $this->config->get('config_mobile_tablets');
+
+		//If mobile or tablet views are disabled
+		if (isset($config_mobile_smartphones) || isset($config_mobile_tablets)) {
+
+			//If there is a setting for smartphones to be disabled and client is a mobile, disable mobile interface
+			if (($this->config->get('config_mobile_smartphones') == true) && isMobile()) {
+
+				return false;
+
+			//If there is a setting for tablets to be disabled and client is a tablet, disable mobile interface
+			} elseif (($this->config->get('config_mobile_tablets') == true) && isTablet()) {
+
+				return false;
+
+			} else {
+
+				return isMobile() || isTablet();
+
+			}
+
+		} else {
+			//No settings for disabling mobile interface or first run
+			return isMobile() || isTablet();
+		}
+	}]]></add>
+
+		</operation>
+		
+	</file>
+</modification>

@@ -1,0 +1,91 @@
+<modification>
+    <id>OpenCart Mobile Framework </id>
+	<version>v2.2.0</version>
+    <vqmver>2.4.1</vqmver>
+    <author>omframework.com / wearebraiv.com </author>
+
+    <file name="admin/controller/extension/module.php">
+    	<operation>
+            <search position="after" regex="true">
+            <![CDATA[
+            ~\$this\-\>load\-\>language|language\-\>load\('extension/module'\);~
+            ]]></search>
+            <add><![CDATA[
+            $this->language->load('omf/common');
+            ]]></add>
+    	</operation>
+
+    	<operation>
+    		<search position="after"><![CDATA[
+    		$this->data['column_action'] = $this->language->get('column_action');
+    		]]></search>
+    		<add><![CDATA[
+    		$this->data['omfa_name'] = $this->language->get('omfa_name');
+    		]]></add>
+    	</operation>
+
+    	<operation>
+    		<search position="after"><![CDATA[
+    		$this->data['extensions'] = array();
+    		]]></search>
+    		<add><![CDATA[
+    		$this->data['mobile_extensions'] = array();
+    		]]></add>
+    	</operation>
+
+    	<operation>
+    		<search position="replace" offset="3"><![CDATA[
+    		$this->data['extensions'][] = array(
+    		]]></search>
+    		<add><![CDATA[
+    		if (strpos($extension, '_mobile') !== false) {
+    			$this->data['mobile_extensions'][] = array(
+					'name'   => $this->language->get('heading_title'),
+					'action' => $action
+				);
+			} else if ($extension === 'omfa') {
+				$this->data['omfa_extension_actions'] = array();
+				$this->data['omfa_extension_actions'] = $action;
+    		} else {
+    			$this->data['extensions'][] = array(
+					'name'   => $this->language->get('heading_title'),
+					'action' => $action
+				);
+    		}
+    		]]></add>
+    	</operation>
+    </file>
+
+    <file name="admin/view/template/extension/module.tpl">
+    	<operation>
+    		<search position="after"><![CDATA[</table>]]></search>
+    		<add><![CDATA[
+    			<table class="list">
+    				<thead>
+			        	<tr>
+				            <td class="left"><?php echo $omfa_name; ?></td>
+				            <td class="right">
+                                <?php if(isset($omfa_extension_actions)) { ?>
+                                <?php foreach ($omfa_extension_actions as $action) { ?>
+                                    [ <a href="<?php echo $action['href']; ?>"><?php echo $action['text']; ?></a> ]
+                                <?php } ?>
+                                <?php } ?>
+                            </td>
+			          	</tr>
+			        </thead>
+			        <tbody>
+					<?php foreach ($mobile_extensions as $extension) { ?>
+						<tr>
+				            <td class="left"><?php echo $extension['name']; ?></td>
+				            <td class="right"><?php foreach ($extension['action'] as $action) { ?>
+				              [ <a href="<?php echo $action['href']; ?>"><?php echo $action['text']; ?></a> ]
+				              <?php } ?></td>
+						</tr>
+					<?php } ?>
+    				</tbody>
+    			</table>
+    		]]></add>
+    	</operation>
+    </file>
+
+</modification>

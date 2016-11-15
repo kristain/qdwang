@@ -1,0 +1,181 @@
+/*
+	This is a custom mobile stylesheet where you can add your styles
+date:2014-12-08
+*/
+#logo{
+	width:30%;
+	float:left;
+}
+#header{
+	padding:5% 0 0 0;
+}
+#search{
+	width:60%;
+	float:left;
+	margin-top:0;
+}
+#search fieldset{
+	margin-bottom:0;
+}
+#header ul{
+	clear:both;
+}
+.inline-form input[type="submit"],
+.box-product .cart .button33{
+	border: 0.1em solid #F82424;
+	background: #C92F2F;
+}
+
+.box-heading{
+	border-bottom: 1px solid #CCC;
+	border-left: 3px solid #F82424;
+	padding-left: 5px;
+	padding-bottom: 5px;
+}
+.box-product>div{
+	display:block;
+	width:100%;
+	border-bottom: 1px solid #CCCCCC;
+	clear:both;
+}
+.box-product>div>div{
+	display:inline-block;
+	float:left;
+}
+.box-product .image{
+	width:30%;
+	margin-bottom: 5%;
+	margin-right: 5%;
+}
+.box-product .image img{
+	border: 1px solid #EEE;
+}
+.box-product .price{
+	width:30%;
+	font-size:1.2em;
+	text-align:left;
+}
+.box-product .model{
+	width:30%;
+	font-size:1.2em;
+	text-align:right;
+}
+.box-product .name{
+	width:65%;
+	font-size:1.2em;
+	text-align:left;
+	margin: 0.3em 0;
+}
+.box-product .cart{
+	width:65%;
+	text-align:left;
+}
+.box-product .cart .button33{
+	width: initial;
+	float: right;
+	font-size: 1.2em;
+	font-weight: initial;
+	border-radius: 10%;
+	padding: 0px 10px;
+	min-height: 2em;
+}
+
+/*分类页面*/
+.product-grid{
+	border-top: 1px solid #CCC;
+}
+.product-grid .cart .button,
+.product-grid .cart .button33{
+	border: 0.1em solid #F82424;
+	background: #C92F2F;
+}
+
+.box-heading{
+	border-bottom: 1px solid #CCC;
+	border-left: 3px solid #F82424;
+	padding-left: 5px;
+	padding-bottom: 5px;
+}
+.product-grid>div{
+	display:block;
+	width:100%;
+	border-bottom: 1px solid #CCCCCC;
+	clear:both;
+	overflow:hidden;
+	padding-top:5%;
+}
+.product-grid>div>div{
+	display:inline-block;
+	float:left;
+}
+.product-grid .image{
+	width:30%;
+	margin-bottom: 5%;
+	margin-right: 5%;
+}
+.product-grid .image img{
+	border: 1px solid #EEE;
+}
+.product-grid .price{
+	width:30%;
+	font-size:1.2em;
+	text-align:left;
+}
+.product-grid .model{
+	width:30%;
+	font-size:1.2em;
+	text-align:right;
+}
+.product-grid .name{
+	width:65%;
+	font-size:1.2em;
+	text-align:left;
+	margin: 0.5em 0;
+}
+.product-grid .cart{
+	width:25%;
+	text-align:left;
+}
+.product-grid .wishlist{
+	width:20%;
+	text-align:left;
+}
+.product-grid .compare{
+	width:20%;
+	text-align:left;
+}
+.product-grid .cart .button33,
+.product-grid .cart .button{
+	width: initial;
+	float: right;
+	font-size: 1.2em;
+	font-weight: initial;
+	border-radius: 10%;
+	padding: 0px 10px;
+	min-height: 2em;
+}
+.product-grid .description{
+	display:none;
+}
+.product-grid .wishlist a,
+.product-grid .compare a{
+	width: initial;
+	float: right;
+	font-size: 1.2em;
+	font-weight: initial;
+	border-radius: 10%;
+	padding: 0px 10px;
+	height: 2em;
+	min-height: 2em;
+	line-height: 2em;
+	margin: 0.833em 0;
+	border: 1px solid #F82424;
+	background-color: #C92F2F;
+	color: #FFF;
+}
+.pagination{
+	clear: both;
+}
+#footer #search{
+	display:none;
+}

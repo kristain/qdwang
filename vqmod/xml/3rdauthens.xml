@@ -1,0 +1,53 @@
+<modification>
+	<id>第三方登录控件</id>
+	<version>For OpenCart 1.5.x</version>
+	<vqmver>1.0</vqmver>
+	<author>Ross</author> 
+	<file name="catalog/view/theme/*/template/common/header.tpl">
+	<!--file name="catalog/view/theme/*/template/account/login.tpl"-->
+		<operation>
+			<search position="replace"><![CDATA[
+		  <tbody><tr><td colspan="2" ><?=$text_third_authen ?></td></tr></tbody>
+			]]></search>
+			<add><![CDATA[		
+		  <tbody><tr><td colspan="2" valign="middle">&nbsp;&nbsp;<?=$text_third_authen ?>	
+<?php if($this->config->get('qq_connect') == 1) { ?>		  
+			<form action="<?php echo $this->url->link('account/qq_connect');?>" id="qq_login_account" method="post">
+				<span id="qqLoginBtn"></span>
+				<input type="hidden" name="openid" id="openid" value="" />
+				<input type="hidden" name="accesstoken" id="accesstoken" value="" />
+			</form>
+			<script type="text/javascript" src="//qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="<?php echo $this->config->get('qq_appid'); ?>" charset="utf-8" ></script>
+			<script type="text/javascript">
+				QC.Login.signOut(); 
+				QC.Login({//自定义登陆按钮
+					btnId : "qqLoginBtn",
+					size : "B_M",
+					scope : "get_user_info",
+					display : "pc"
+				},function(){
+					var dom = document.getElementById('openid');
+					var dom1 = document.getElementById('accesstoken');
+					var c_loginaccount = document.getElementById('qq_login_account');
+					QC.Login.getMe(function(openId, accessToken){
+						dom.value = openId;
+						dom1.value = accessToken;
+						c_loginaccount.submit();
+					});
+				},function(){
+				});
+			</script> 
+<?php }  
+if($this->config->get('weibo_connect') == 1) { 
+include_once( DIR_APPLICATION.'ext/weibo_saetv2.ex.class.php' );
+$o = new SaeTOAuthV2( $this->config->get('weibo_appkey') , $this->config->get('weibo_secret'));
+
+$weibo_code_url = $o->getAuthorizeURL( $this->url->link('account/weibo_connect') );
+?>
+<a href="<?=$weibo_code_url?>"><img src="/catalog/view/theme/default/image/weibo_button.png" /></a>	
+<?php } ?>
+		  </td></tr></tbody>				
+			]]></add>
+		</operation>
+	</file> 
+</modification>

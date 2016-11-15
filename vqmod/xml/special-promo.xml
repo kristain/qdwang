@@ -1,0 +1,65 @@
+<modification>
+	<id><![CDATA[special-promo-image]]></id>
+	<version><![CDATA[1.0]]></version>
+	<vqmver><![CDATA[2.1.6]]></vqmver>
+	<author><![CDATA[All Rights Reserved-BIDatw.com]]></author>
+	
+	<file name="catalog/view/theme/*/template/module/special.tpl" >
+		<operation>
+		   <search position="after"><![CDATA[
+      <?php if ($product['thumb']) { ?>
+      ]]></search>
+		   
+		   <add><![CDATA[<div>
+		   <div class="specialPercent" style="background: url('image/promo.png') no-repeat;
+	width: 70px;
+	height: 50px;
+	text-align: center;
+	color: #fff;
+	font-weight: bold;
+	padding-top: 20px;
+	text-shadow: 0 -1px 1px #CE5016;
+	position: absolute;
+	float: right;
+	font-size: 13px;">
+			<?php 
+				  //Get Currency Symbol				  
+				  $symLeft = $this->currency->getSymbolLeft();
+				  $symRight = $this->currency->getSymbolRight();
+				  
+				  if($symLeft != NULL){
+					$currCode = $this->currency->getSymbolLeft();
+				  }else{
+					$currCode = $this->currency->getSymbolRight();
+				  }
+			
+				  //Get the percentage discount
+                  $normal =  strip_tags(str_replace($currCode,'', $product['price']));
+				  	$normalP =strip_tags(str_replace(',','', $normal));
+                  $special = strip_tags(str_replace($currCode,'', $product['special']));
+				  	$specialP =strip_tags(str_replace(',','', $special));
+                //  $percent = ($normalP-$specialP)/$normalP*100;
+                //  echo round($percent) . $this->language->get('text_off');	
+				    echo  $this->language->get('text_off')
+            ?>               
+        
+		</div>
+		</div>]]></add>
+		    </operation>
+	</file>
+	
+	<file name="catalog/language/*/module/special.php">
+        <operation>
+            <search position="after"><![CDATA[
+            <?php
+            ]]></search>
+            <add><![CDATA[
+           
+	    $_['text_off'] = '<small></small> SALE';
+		$_['text_left'] = '<span class="left">left</span>';
+            ]]></add>
+        </operation>
+	</file>
+	
+	
+</modification>

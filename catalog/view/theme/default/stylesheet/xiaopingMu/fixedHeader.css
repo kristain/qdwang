@@ -1,0 +1,56 @@
+#fixedHeader {
+	position:fixed;
+	width: 100%;
+	padding: 2px 0;
+	background: #fff;
+	top: -50px;
+	z-index: 100;
+	box-shadow: 0 0 10px 0px #888;
+	display: none;
+}
+
+#fixedHeader > div {
+	width: 1000px;
+	margin: 0 auto;
+}
+
+
+#fixedHeader #logoFixed {
+	float: left;
+}
+
+#fixedHeader #logoFixed img {
+	width: 179px;
+}
+
+#fixedHeader .links {
+	float:right;
+	margin-top: 10px;
+}
+
+#fixedHeader .links a {
+	color: #38B0E3;
+	display: block;
+	float: left;
+	font-size: 12px;
+	padding: 0 0 0 7px;
+	text-decoration: none;
+}
+
+#fixedHeader div > .links a+a {
+	border-left: 1px solid #CCCCCC;
+	margin-left: 8px;
+}
+
+#fixedHeader #cartFixed {
+	float:right;
+	margin: 8px 15px 0 0;
+	cursor: pointer;
+}
+
+#fixedHeader #cartFixed h4 {
+	color: #333333;
+	font-size: 15px;
+	font-weight: bold;
+	display: inline;
+}

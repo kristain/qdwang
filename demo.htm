@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>GIS开发利用html5获取经纬度</title>
+</head>
+
+<body>
+<span id="support">将下面的经纬度输入谷歌地图：</span>
+<div id="show">
+纬度：<span id="latitude"></span><br />
+经度：<span id="longitude"></span><br />
+准确度：<span id="accuracy"></span>
+</div>
+<script type="text/javascript">
+var doc = document,
+    latitude = doc.getElementById('latitude'),
+    longitude = doc.getElementById('longitude'),
+    accuracy = doc.getElementById('accuracy'),
+    support = doc.getElementById('support'),
+    showDiv = doc.getElementById('show');
+function lodeSupport(){
+    if(navigator.geolocation){
+        support.innerHTML = '将下面的经纬度输入谷歌地图(纬度 经度)查看自己位置：';
+        showDiv.style.display = 'block';
+        navigator.geolocation.getCurrentPosition(updataPosition,locationError,{
+        // 指示浏览器获取高精度的位置，默认为false
+        enableHighAcuracy: false,
+        // 指定获取地理位置的超时时间，默认不限时，单位为毫秒
+        timeout: 60000,
+        // 最长有效期，在重复获取地理位置时，此参数指定多久再次获取位置。
+        maximumAge: 3000
+    });
+    }else{
+        support.innerHTML = '对不起，浏览器不支持！';
+        showDiv.style.display = 'none';
+    }
+}
+function updataPosition(position){
+    var latitudeP = position.coords.latitude,
+        longitudeP = position.coords.longitude,
+        accuracyP = position.coords.accuracy;
+    latitude.innerHTML = latitudeP;
+    longitude.innerHTML = longitudeP;
+    accuracy.innerHTML = accuracyP;
+}
+function locationError(error){
+// 执行失败的回调函数，会接受一个error对象作为参数
+          // error拥有一个code属性和三个常量属性TIMEOUT、PERMISSION_DENIED、POSITION_UNAVAILABLE
+          // 执行失败时，code属性会指向三个常量中的一个，从而指明错误原因
+          switch(error.code){
+               case error.TIMEOUT:
+                    alert('超时');
+                    break;
+               case error.PERMISSION_DENIED:
+                    alert('用户拒绝提供地理位置');
+                    break;
+               case error.POSITION_UNAVAILABLE:
+                    alert('地理位置不可用');
+                    break;
+               default:
+                    break;
+          }
+}
+window.addEventListener('load', lodeSupport , true);
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+	<id>Display Dimensions on Product Page (product.tpl)</id>
+	<version>1.1</version>
+	<vqmver>2.3.0</vqmver>
+	<author>ThePath - the1path.com</author>
+	
+	<file name="catalog/model/catalog/product.php">
+		<operation>
+			<search position="after"><![CDATA['length_class_id'  => $query->row['length_class_id'],]]></search>
+			<add><![CDATA[
+			'length_class'  => $query->row['length_class'],
+			]]></add>
+		</operation>
+	</file>
+	<file name="catalog/controller/product/product.php">
+		<operation>
+			<search position="before"><![CDATA[$this->data['model']]]></search>
+			<add><![CDATA[			
+			if ($product_info['length'] != '0') {
+				$this->data['length'] = round($product_info['length'], 2) . $product_info['length_class'];
+			} else {
+				$this->data['length'] = NULL;
+			}
+			if ($product_info['width'] != '0') {
+				$this->data['width'] = round($product_info['width'], 2) . $product_info['length_class'];
+			} else {
+				$this->data['width'] = NULL;
+			}
+			if ($product_info['height'] != '0') {
+				$this->data['height'] = round($product_info['height'], 2) . $product_info['length_class'];
+			} else {
+				$this->data['height'] = NULL;
+			}
+			]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[$this->data['text_manufacturer'] =]]></search>
+			<add><![CDATA[			
+			$this->data['text_dimensions'] = $this->language->get('text_dimensions');
+			$this->data['text_by'] = $this->language->get('text_by');
+			]]></add>
+		</operation>
+	</file>
+	<file name="catalog/language/english/product/product.php">
+		<operation>
+			<search position="before"><![CDATA[$_['text_reward']]]></search>
+			<add><![CDATA[
+			$_['text_dimensions'] = 'Dimensions:';
+			$_['text_by'] = '&nbsp;x&nbsp;';
+			]]></add>
+		</operation>
+	</file>
+	<file name="catalog/view/theme/*/template/product/product.tpl">
+		<operation>
+			<search position="before"><![CDATA[<?php if ($manufacturer) { ?>]]></search>
+			<add><![CDATA[
+			<?php if( isset($length) || isset($height) || isset($width) ) { ?>
+				<span><?php echo $text_dimensions; ?></span> <?php if( isset($length) ) { ?>L: <?php echo $length; ?> <?php echo $text_by; } ?> <?php if( isset($width) ) { ?>W: <?php echo $width; ?> <?php echo $text_by; } ?> <?php if( isset($height) ) { ?>H: <?php echo $height; } ?><br /> 
+			<?php } ?>
+			]]></add>
+		</operation>
+	</file>
+</modification>

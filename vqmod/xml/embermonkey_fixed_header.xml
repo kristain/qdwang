@@ -1,0 +1,75 @@
+<modification>
+	<id>embermonkey - MiniHeader, Fixed position header for OpenCart</id>
+	<version>1</version>
+	<vqmver>2</vqmver>
+	<author>OpenCartPlus</author>
+	
+	<!-- Front End -->
+	<file name="catalog/view/theme/*/template/common/header.tpl">
+		<operation error="log">
+			<search position="replace"><![CDATA[</head>]]></search>
+			<add>
+				<![CDATA[
+<script type="text/javascript">
+// Fixed Header
+$(document).ready(function(){
+	// Copy our header id and place it in the headerFixed id
+	var header = "<div id='logoFixed'>"+$("#header").find("#logo").html()+"</div>";
+	//header += "<div class='links'>"+$("#header").find(".links").html()+"</div>";
+	header += "<div id='cartFixed'><h4>"+$("#header").find(".heading > h4").html()+"</h4> - "+$("#header").find(".heading > a").html()+"</div>";
+	$("#fixedHeader").html("<div>"+header+"</div>");
+	
+	// Set our click for cart
+	$("#cartFixed").on('click', function(){
+		//window.location.href ="index.php?route=checkout/cart";
+	});
+	
+	//Set our transistion type
+	var showFixedHeader = function (trans, scrollValue){
+		var elem = $("#fixedHeader");
+		if(trans == "fade"){
+			elem.fadeIn();
+		}else if(trans == "animate"){
+			elem.show();
+			elem.stop().animate({top: "0"}, 250);
+		}else{
+			elem.show();
+		}
+	}
+	
+	var hideFixedHeader = function (trans){
+		var elem = $("#fixedHeader");
+		if(trans == "fade"){
+			elem.fadeOut();
+		}else if(trans == "animate"){
+			elem.stop().animate({top: "-50px"}, 250);
+		}else{
+			elem.hide();
+		}
+	}
+	
+	// Show our fixed header
+	var position = $("#header").position();
+	var height = $("#header").height();
+	var scrollValue = height+position.top;
+	$(window).scroll(function() {
+		if ($(this).scrollTop() > scrollValue) {
+			showFixedHeader("animate");
+		} else {
+			hideFixedHeader("animate");
+		}
+	});
+	
+	$("#cartFixed").on("click", function(){
+		window.location.replace('index.php?route=checkout/cart');
+	});
+});
+</script>
+<link rel="stylesheet" type="text/css" href="catalog/view/theme/default/stylesheet/fixedHeader.css" />
+</head>
+<div id="fixedHeader"></div>
+				]]>
+			</add>
+		</operation>
+	</file>
+</modification>

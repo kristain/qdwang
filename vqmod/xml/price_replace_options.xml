@@ -1,0 +1,205 @@
+ <modification>
+        <id>price_replace_options_quantities</id>
+        <version>1.7price_replace_options_quantities</version>
+        <vqmver>1.0</vqmver>
+        <author>ocextensions.co.uk</author>
+ <file name="catalog/controller/product/product.php">  
+              <operation>
+                        <search position="after" index="2" offset="3"><![CDATA[$this->response->setOutput($this->render());]]></search>
+                        <add><![CDATA[public function add() {
+		$this->language->load('checkout/cart');
+                                       $hold = array();
+		                       $json = array();
+		
+		if (isset($this->request->post['product_id'])) {
+			$product_id = $this->request->post['product_id'];
+		} else {
+			$product_id = 0;
+		}
+		
+		$this->load->model('catalog/product');
+						
+		$product_info = $this->model_catalog_product->getProduct($product_id);
+		
+		if ($product_info) {
+                            if (isset($this->request->post['quantity'])) {
+				$quantity = $this->request->post['quantity'];
+			} else {
+		       $quantity = 1;								
+			}
+												
+			if (isset($this->request->post['option'])) {
+				$option = array_filter($this->request->post['option']);
+			} else {
+				$option = array();	
+			}
+			
+			$product_options = $this->model_catalog_product->getProductOptions($this->request->post['product_id']);
+			
+			 if (isset($this->session->data['cart'])) {
+
+                         $hold = $this->session->data['cart'];
+     		         unset($this->session->data['cart']);
+                            
+                            if (!$option) {
+      		$keyx = (int)$product_id;
+    	} else {
+      		$keyx = (int)$product_id . ':' . base64_encode(serialize($option));
+    	}
+    	                unset($this->session->data['cart'][$keyx]);
+                        $this->data = array();
+      			$this->session->data['cart'][$keyx] = (int)$quantity;
+				$json['success'] = '0';
+                                
+                                unset($this->session->data['shipping_method']);
+				unset($this->session->data['shipping_methods']);
+				unset($this->session->data['payment_method']);
+				unset($this->session->data['payment_methods']);
+                                
+				// Totals
+				$this->load->model('setting/extension');
+				
+				$total_data = array();					
+				$total = 0;
+				$taxes = $this->cart->getTaxes();
+				
+				// Display prices
+				if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
+					$sort_order = array(); 
+					
+					$results = $this->model_setting_extension->getExtensions('total');
+					
+					foreach ($results as $key => $value) {
+						$sort_order[$key] = $this->config->get($value['code'] . '_sort_order');
+					}
+					
+					array_multisort($sort_order, SORT_ASC, $results);
+					
+					foreach ($results as $result) {
+						if ($this->config->get($result['code'] . '_status')) {
+							$this->load->model('total/' . $result['code']);
+				
+							$this->{'model_total_' . $result['code']}->getTotal($total_data, $total, $taxes);
+						}
+						
+						$sort_order = array(); 
+					  
+						foreach ($total_data as $key => $value) {
+							$sort_order[$key] = $value['sort_order'];
+						}
+			
+						array_multisort($sort_order, SORT_ASC, $total_data);			
+					}
+				}
+			if (isset($this->session->data['cart'][$keyx])) {
+     		          unset($this->session->data['cart'][$keyx]);
+  		                               }   
+                         if ($this->config->get('config_tax') == '0') {    
+                            $val = array_sum($taxes);
+                          $total = $total - $val;
+                               }    
+                           $products = $this->cart->getProducts();  							   
+                           $json['price'] = sprintf($this->currency->format($products[$keyx]['price']));
+                  $this->session->data['cart'] = $hold;  
+				$json['total'] = sprintf($this->currency->format($total));
+                                          $tax = $total - array_sum($taxes);
+                                  $json['tax'] =  sprintf($this->currency->format($tax));
+			} else {
+				$json['redirect'] = str_replace('&amp;', '&', $this->url->link('product/product', 'product_id=' . $this->request->post['product_id']));
+			}
+		}
+		$this->response->setOutput(json_encode($json));		
+	}
+	]]></add>
+              </operation>
+ </file>
+ <file name="catalog/view/theme/*/template/product/product.tpl">  
+               <operation>
+                        <search position="replace"><![CDATA[<input type="text" name="quantity" size="2" value="<?php echo $minimum; ?>" />]]></search>
+                        <add><![CDATA[               <input id='bc' type="text" name="quantity" size="2" value="<?php echo $minimum; ?>" />]]>
+                        </add>
+               </operation> 
+                <operation>
+                        <search position="replace" index='1'><![CDATA[<?php echo $text_price; ?>]]></search>
+                        <add><![CDATA[<?php // echo $text_price; ?>]]></add>
+                </operation>
+                <operation>
+                        <search position="replace" index='1'><![CDATA[<?php echo $price."/".$sku; ?>]]></search>
+                        <add><![CDATA[         <div class="opprice"><?php echo $text_price; ?><?php echo $price."/".$sku; ?></div>
+                                            ]]>
+                        </add>
+                </operation>
+                <operation>
+                        <search position="replace" index='1'><![CDATA[<span class="price-tax"><?php echo $text_tax; ?> <?php echo $tax; ?></span><br />]]></search>
+                        <add><![CDATA[<div class="price-tax"><?php echo $text_tax; ?> <?php echo $tax; ?></div>]]>
+                        </add>
+                </operation>
+                <operation>
+                        <search position="replace" index='1'><![CDATA[<span class="price-new"><?php echo $special."/".$sku;; ?></span>]]></search>
+                        <add><![CDATA[<span class="price-new"><div class="opprice"><?php echo $text_price; ?><?php echo $special."/".$sku; ?></div></span>]]></add>
+                </operation>
+                <operation>
+                        <search position="after" index='1'><![CDATA[//--></script>]]></search>
+                        <add><![CDATA[<script type="text/javascript"><!--
+function a(){ 
+	$.ajax({
+		url: 'index.php?route=product/product/add',
+		type: 'post',
+		data: $('.product-info input[type=\'text\'], .product-info input[type=\'hidden\'], .product-info input[type=\'radio\']:checked, .product-info input[type=\'checkbox\']:checked, .product-info select, .product-info textarea'),
+		dataType: 'json',
+		success: function(json) {
+			$('.success, .warning, .attention, information, .error').remove();
+			if (json['error']) {
+				if (json['error']['option']) {
+					for (i in json['error']['option']) {
+						$('#option-' + i).after('<span class="error">' + json['error']['option'][i] + '</span>');
+					}
+				}
+			} 
+			if (json['success']) {
+				$('.opprice').html ('<?php echo $text_price; ?>'+json['price']+'/'+$("#product_sku").val());
+                                $('.price-tax').html ('<?php echo $text_tax; ?> ' + json['tax']);
+                            html = '';
+                            $.each(json.oprice, function(i, object) {   
+                                                           html += object;
+                                                                 });
+                              $('.pandc').html(html);
+		                          }
+	    }
+	});
+} 
+$(document).on("change", ".option", a);
+$(document).on("keyup", "#bc", a);    
+	
+$( document ).ready(function() { 
+	$.ajax({
+		url: 'index.php?route=product/product/add',
+		type: 'post',
+		data: $('.product-info input[type=\'text\'], .product-info input[type=\'hidden\'], .product-info input[type=\'radio\']:checked, .product-info input[type=\'checkbox\']:checked, .product-info select, .product-info textarea'),
+		dataType: 'json',
+		success: function(json) {
+			$('.success, .warning, .attention, information, .error').remove();
+			if (json['error']) {
+				if (json['error']['option']) {
+					for (i in json['error']['option']) {
+						$('#option-' + i).after('<span class="error">' + json['error']['option'][i] + '</span>');
+					}
+				}
+			} 
+			if (json['success']) {
+			   html = '';
+                            $.each(json.oprice, function(i, object) {   
+                                                           html += object;
+                                                                 });
+                              $('.pandc').html(html);
+		                          }
+	    }
+	});
+});
+//--></script>
+]]>
+                        </add>
+                </operation>
+  </file>
+ </modification>
+      

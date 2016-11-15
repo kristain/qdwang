@@ -1,0 +1,25 @@
+<modification>
+  <id>Out of Stock Report</id>
+  <version>1.5.4</version>
+  <vqmver>2.1</vqmver>
+  <author>Reason8.com.au</author>
+  
+  
+  <file name="admin/view/template/common/header.tpl">
+    <operation>
+      <search position="after"><![CDATA[<li><a href="<?php echo $report_product_purchased; ?>"><?php echo $text_report_product_purchased; ?></a></li>]]></search>
+      <add><![CDATA[<li><a href="<?php echo 'index.php?route=report/product_quantity&token=' . $this->session->data['token']; ?>">库存不足报表</a></li>]]></add>
+    </operation>
+  </file>
+	<file path="admin/model/report/" name="product.php">
+		<operation>
+			<search position="before"><![CDATA[public function getTotalPurchased($data) {]]></search>
+			<add><![CDATA[	public function getProductsQuantity($data = array()) {
+			$sql = "SELECT pd.name, p.model, p.quantity FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id) WHERE pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND p.quantity <6 and p.status=1 ORDER BY p.quantity ASC, pd.name ASC LIMIT 999";	
+			$query = $this->db->query($sql);
+			return $query->rows;
+		}]]></add>
+		</operation>
+	</file>
+	
+</modification>

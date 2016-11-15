@@ -1,0 +1,61 @@
+<modification>
+
+	<id>Affiliate profile</id>
+	<version>1.0.1</version>
+	<vqmver>2.1.5</vqmver>
+	<author>Fabrikator</author>
+	
+	<file name="catalog/controller/affiliate/account.php">
+		<operation><search position="before"><![CDATA[$this->document->setTitle($this->language->get('heading_title'));]]></search>
+			<add><![CDATA[$this->data['text_balance'] = $this->language->get('text_balance');]]></add>
+		</operation>
+		<operation><search position="after"><![CDATA[$this->document->setTitle($this->language->get('heading_title'));]]></search>
+			<add><![CDATA[$this->load->model('affiliate/affiliate');
+			$this->load->model('affiliate/transaction');]]></add>
+		</operation>
+		<operation><search position="after"><![CDATA[$this->language->get('text_transaction');]]></search>
+			<add><![CDATA[$this->data['balance'] = $this->currency->format($this->model_affiliate_transaction->getBalance());
+			
+		if ($this->request->server['REQUEST_METHOD'] != 'POST') {
+			$affiliate_info = $this->model_affiliate_affiliate->getAffiliate($this->affiliate->getId());
+		}
+
+		if (isset($this->request->post['firstname'])) {
+			$this->data['firstname'] = $this->request->post['firstname'];
+		} elseif (!empty($affiliate_info)) {
+			$this->data['firstname'] = $affiliate_info['firstname'];
+		} else {
+			$this->data['firstname'] = '';
+		}
+		
+		if (isset($this->request->post['lastname'])) {
+			$this->data['lastname'] = $this->request->post['lastname'];
+		} elseif (!empty($affiliate_info)) {
+			$this->data['lastname'] = $affiliate_info['lastname'];
+		} else {
+			$this->data['lastname'] = '';
+		}]]></add>
+		</operation>
+	</file>
+	
+	<file name="catalog/language/zh-CN/affiliate/account.php">
+	    <operation><search position="before"><![CDATA[$_['text_transaction']]]></search>
+			<add><![CDATA[$_['text_balance']         = '账户余额: ';]]></add>
+		</operation>
+	</file>
+	<file name="catalog/language/russian/affiliate/account.php">
+	    <operation><search position="before"><![CDATA[$_['text_transaction']]]></search>
+			<add><![CDATA[$_['text_balance']         = 'Баланс: ';]]></add>
+		</operation>
+	</file>
+	
+	<file name="catalog/view/theme/*/template/affiliate/account.tpl">
+	    <operation><search position="before"><![CDATA[<h2><?php echo $text_my_account; ?></h2>]]></search>
+			<add><![CDATA[<div style="font-size:20px;margin:0 0 10px">
+			  <div style="display:inline-block"><?php echo $firstname; ?> <?php echo $lastname; ?></div>
+			  <div style="float:right"><?php echo $text_balance; ?><?php echo $balance; ?></div>
+			</div>]]></add>
+		</operation>
+	</file>
+	
+</modification>

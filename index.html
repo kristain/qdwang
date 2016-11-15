@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>家用网</title>
+<script type="text/javascript" src="catalog/view/javascript/jquery/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="catalog/view/javascript/jquery/ui/jquery-ui-1.8.16.custom.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="catalog/view/javascript/jquery/ui/themes/ui-lightness/jquery-ui-1.8.16.custom.css" />
+    <script type="text/javascript" src="catalog/view/javascript/jquery/ui/external/jquery.cookie.js"></script>
+    <script type="text/javascript" src="catalog/view/javascript/jquery/colorbox/jquery.colorbox.js"></script>
+    <link rel="stylesheet" type="text/css" href="catalog/view/javascript/jquery/colorbox/colorbox.css" media="screen" />
+    <script type="text/javascript" src="catalog/view/javascript/jquery/tabs.js"></script>
+</head>
+
+<body>
+<script type="text/javascript">
+function lodeSupport(){
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(updataPosition,locationError,{
+        // 指示浏览器获取高精度的位置，默认为false
+        enableHighAcuracy: false,
+        // 指定获取地理位置的超时时间，默认不限时，单位为毫秒
+        timeout: 60000,
+        // 最长有效期，在重复获取地理位置时，此参数指定多久再次获取位置。
+        maximumAge: 3000
+    });
+    }else{
+        alert('对不起，浏览器不支持！');
+    }
+}
+function updataPosition(position){
+    var latitudeP = position.coords.latitude,
+        longitudeP = position.coords.longitude,
+        accuracyP = position.coords.accuracy;
+	$.cookie('position', longitudeP+','+latitudeP); 
+	location = '/lyhpfb';
+}
+function locationError(error){
+// 执行失败的回调函数，会接受一个error对象作为参数
+          // error拥有一个code属性和三个常量属性TIMEOUT、PERMISSION_DENIED、POSITION_UNAVAILABLE
+          // 执行失败时，code属性会指向三个常量中的一个，从而指明错误原因
+          switch(error.code){
+               case error.TIMEOUT:
+                    alert('超时');
+                    break;
+               case error.PERMISSION_DENIED:
+                    alert('用户拒绝提供地理位置');
+                    break;
+               case error.POSITION_UNAVAILABLE:
+                    alert('地理位置不可用');
+                    break;
+               default:
+                    break;
+          }
+}
+var isOnPc=!(/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent));
+if(isOnPc){
+ //如果是电脑登陆，直接跳转到首页
+ location = '/lyhpfb';
+}else {
+ //移动端登陆则获取经纬度信息
+  window.addEventListener('load', lodeSupport , true);
+}
+</script>
+</body>
+</html>

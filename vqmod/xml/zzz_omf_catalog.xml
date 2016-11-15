@@ -1,0 +1,619 @@
+<modification>
+	<id>OpenCart Mobile Framework</id>
+	<version>v2.2.0</version>
+    <vqmver>2.4.1</vqmver>
+    <author>omframework.com / braiv.com</author>
+
+<!-- 	*********************************************************
+			Common
+		*********************************************************
+-->
+    <file name="catalog/controller/common/header.php">
+    	<operation>
+			<search position="after"><![CDATA[
+			$this->language->load('common/header');
+			]]></search>
+			<add><![CDATA[//OMF start
+		if($this->isVisitorMobile()) {
+			$this->language->load('omf/common');
+		}//OMF  end
+		]]>
+			</add>
+		</operation>
+    	
+    	<operation>
+			<search position="after"><![CDATA[
+			$this->data['name'] = $this->config->get('config_name');	
+			]]></search>
+			<add><![CDATA[
+			$this->data['text_items_count'] = $this->cart->countProducts();
+			$this->data['text_search_link'] = $this->language->get('text_search_link');
+			]]></add>
+		</operation>
+		
+		<operation>
+			<search position="after" index="1"><![CDATA[
+			$this->data['direction'] = $this->language->get('direction');
+			]]></search>
+			<add><![CDATA[
+			$this->data['text_view'] = $this->language->get('text_view');
+			$this->data['text_mobile'] = $this->language->get('text_mobile');
+			$this->data['text_standard'] = $this->language->get('text_standard');
+			if($this->isVisitorMobile()) {
+				$this->data['text_top'] = $this->language->get('text_top');
+
+				if (file_exists(DIR_APPLICATION . 'controller/module/omf_header.php')) {
+					$this->data['module'] = $this->getChild('module/omf_header');
+				}
+			}
+			]]></add>
+		</operation>
+    </file>
+
+    <file name="catalog/controller/common/content*.php">
+		<operation error="log">
+			<search position="after"><![CDATA[
+			foreach ($extensions as $extension) {
+			]]></search>
+			<add><![CDATA[//OMF start
+			$isMobileExtension = false;
+
+			if(strpos($extension['code'], '_mobile') !== false) {
+				$isMobileExtension = true;
+			}//OMF end ]]>
+			</add>
+		</operation>
+		
+		<operation error="log">
+			<search position="before"><![CDATA[
+			$sort_order = array();
+			]]></search>
+			<add><![CDATA[//OMF start
+		}//OMF end ]]>
+			</add>
+		</operation>
+	</file>
+
+	<file name="catalog/controller/common/column*.php">
+		<operation error="log">
+			<search position="after"><![CDATA[
+			foreach ($extensions as $extension) {
+			]]></search>
+			<add><![CDATA[//OMF start
+			$isMobileExtension = false;
+
+			if(strpos($extension['code'], '_mobile') !== false) {
+				$isMobileExtension = true;
+			}//OMF end ]]>
+			</add>
+		</operation>
+
+		<operation error="log">
+			<search position="before"><![CDATA[
+			$sort_order = array();
+			]]></search>
+			<add><![CDATA[//OMF start
+		}//OMF end ]]>
+			</add>
+		</operation>
+	</file>
+	
+	<file name="catalog/model/catalog/product.php">
+
+		<operation error="log">
+			<search position="before"><![CDATA[
+			$this->cache->set('product.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . (int)$customer_group_id . '.' . $cache, $product_data);
+			]]></search>
+			<add><![CDATA[
+			foreach ($product_data as $key => $value) {
+               $distance[$key] = $value['distance'];
+            }
+            if(!empty($product_data)){
+              array_multisort($distance,SORT_NUMERIC, $product_data);
+            }
+			]]>
+			</add>
+		</operation>
+	</file>
+
+	<file name="catalog/controller/common/content_top.php">
+ 		<operation error="log">
+			<search position="after"><![CDATA[
+			foreach ($modules as $module) {
+			]]></search>
+			<add><![CDATA[//OMF start
+					if($this->isVisitorMobile()) { //OMF If our client is a mobile device
+						if ($module['layout_id'] == $layout_id && $module['position'] == 'content_top' && $module['status'] && ($isMobileExtension || $this->config->get('config_modules_' . $extension['code']))) { //load only enabled an mobile extensions
+							$module_data[] = array(
+								'code'       => $extension['code'],
+								'setting'    => $module,
+								'sort_order' => $module['sort_order']
+							);
+						}
+					} else if(!$isMobileExtension) { // Load extensions normally 
+				//OMF end  
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/controller/common/content_bottom.php">
+ 		<operation error="log">
+			<search position="after"><![CDATA[
+			foreach ($modules as $module) {
+			]]></search>
+			<add><![CDATA[//OMF start
+					if($this->isVisitorMobile()) { //OMF If our client is a mobile device
+						if ($module['layout_id'] == $layout_id && $module['position'] == 'content_bottom' && $module['status'] && ($isMobileExtension || $this->config->get('config_modules_' . $extension['code']))) { //load only enabled an mobile extensions
+							$module_data[] = array(
+								'code'       => $extension['code'],
+								'setting'    => $module,
+								'sort_order' => $module['sort_order']
+							);
+						}
+					} else if(!$isMobileExtension) { // Load extensions normally 
+				//OMF end  
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/controller/common/column_right.php">
+ 		<operation error="log">
+			<search position="after"><![CDATA[
+			foreach ($modules as $module) {
+			]]></search>
+			<add><![CDATA[//OMF start
+					if($this->isVisitorMobile()) { //OMF If our client is a mobile device
+						if ($module['layout_id'] == $layout_id && $module['position'] == 'column_right' && $module['status'] && ($isMobileExtension || $this->config->get('config_modules_' . $extension['code']))) { //load only enabled an mobile extensions
+							$module_data[] = array(
+								'code'       => $extension['code'],
+								'setting'    => $module,
+								'sort_order' => $module['sort_order']
+							);
+						}
+					} else if(!$isMobileExtension) { // Load extensions normally  
+				//OMF end  
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/controller/common/column_left.php">
+ 		<operation error="log">
+			<search position="after"><![CDATA[
+			foreach ($modules as $module) {
+			]]></search>
+			<add><![CDATA[//OMF start
+					if($this->isVisitorMobile()) { //OMF If our client is a mobile device
+						if ($module['layout_id'] == $layout_id && $module['position'] == 'column_left' && $module['status'] && ($isMobileExtension || $this->config->get('config_modules_' . $extension['code']))) { //load only enabled an mobile extensions
+							$module_data[] = array(
+								'code'       => $extension['code'],
+								'setting'    => $module,
+								'sort_order' => $module['sort_order']
+							);
+						}
+					} else if(!$isMobileExtension) { // Load extensions normally  
+				//OMF end  
+			]]></add>
+		</operation>
+	</file>
+	
+    <file name="catalog/controller/common/footer.php"> 
+    	<operation>
+			<search position="after"><![CDATA[
+			$this->language->load('common/footer');
+			]]></search>
+			<add><![CDATA[
+		if($this->isVisitorMobile()) {
+			$this->language->load('common/header');
+		}
+		$this->language->load('omf/common');
+			]]></add>
+		</operation>
+
+    	<operation>
+			<search position="after" index="1"><![CDATA[
+			'text_newsletter'	
+			]]></search>
+			<add><![CDATA[
+			$this->data['text_view'] = $this->language->get('text_view');
+			$this->data['text_mobile'] = $this->language->get('text_mobile');
+			$this->data['text_standard'] = $this->language->get('text_standard');
+			if($this->isVisitorMobile()) {
+				$this->data['text_top'] = $this->language->get('text_top');
+
+				if (file_exists(DIR_APPLICATION . 'controller/module/omf.php')) {
+					$this->data['module'] = $this->getChild('module/omf');
+				}
+			}
+			]]></add>
+		</operation>
+    </file>
+
+
+<!-- 	*********************************************************
+			Product
+		*********************************************************
+-->
+    <file name="catalog/controller/product/*.php">
+		<operation error="skip">
+			<search position="replace" regex="true"><![CDATA[
+			~\$image = \$this\-\>model_tool_image\-\>resize\(\$result\['image'\], \$this\-\>config\-\>get\('config_image_(\w*)_width'\), \$this\-\>config\-\>get\('config_image_(\w*)_height'\)\);~
+			]]></search>
+			<add><![CDATA[
+				if($this->isVisitorMobile()) {
+						$resolution = getResolution();
+						$image = $this->model_tool_image->resize($result['image'], $resolution, $resolution);
+				}else {
+						$image = $this->model_tool_image->resize($result['image'], $this->config->get('config_image_$1_width'), $this->config->get('config_image_$2_height'));
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/controller/product/product.php">
+		<operation>
+			<search position="replace" regex="true"><![CDATA[
+			~\$this\-\>data\['thumb'\] = \$this\-\>model_tool_image\-\>resize\(\$(\w*)_info\['image'\], \$this\-\>config->get\('config_image_(\w*)_width'\), \$this\-\>config\-\>get\('config_image_(\w*)_height'\)\);~
+			]]></search>
+			<add><![CDATA[
+			if($this->isVisitorMobile()) {
+				$resolution = getResolution();
+				$this->data['thumb'] = $this->model_tool_image->resize($$1_info['image'], $resolution, $resolution, 'r');
+			} else {
+				$this->data['thumb'] = $this->model_tool_image->resize($$1_info['image'], $this->config->get('config_image_$2_width'), $this->config->get('config_image_$3_height'));
+			}
+			]]></add>
+		</operation>
+
+		<operation>
+			<search position="after"><![CDATA[
+			$this->data['images'] = array();
+			]]></search>
+			<add><![CDATA[
+			$this->data['slide_images'] = array();
+			]]></add>
+		</operation>
+
+    	<operation>
+			<search position="before"><![CDATA[
+			$this->data['images'][] = array(
+			]]></search>
+			<add><![CDATA[
+			if($this->isVisitorMobile()) {
+				$resolution = getResolution();
+				$this->data['slide_images'][] = array(
+				'popup' => $this->model_tool_image->resize($result['image'], $resolution, $resolution, 'r'),
+				'thumb' => $this->model_tool_image->resize($result['image'], $resolution, $resolution, 'r')
+				);
+				$this->data['images'][] = array(
+					'popup' => $this->model_tool_image->resize($result['image'], $this->config->get('config_image_popup_width'), $this->config->get('config_image_popup_height')),
+					'thumb' => $this->model_tool_image->resize($result['image'], $this->config->get('config_image_additional_width'), $this->config->get('config_image_additional_height'))
+				);
+			} else {
+			]]></add>
+		</operation>
+
+		<operation>
+			<search position="before" index="1"><![CDATA[
+			if (($this->config->get('config_customer_price')
+			]]></search>
+			<add><![CDATA[
+		}
+			]]></add>
+		</operation>
+
+		<operation>
+			<search position="after"><![CDATA[
+			if ($product_info['quantity'] <= 0) {
+			]]></search>
+			<add><![CDATA[
+		if($this->isVisitorMobile() && $this->config->get('config_disable_addtocart_outofstock')) {
+			$this->data['out_of_stock'] = true;
+		}
+			]]></add>
+		</operation>
+
+		<operation>
+			<search position="after"><![CDATA[
+			$this->language->load('product/product');
+			]]></search>
+			<add><![CDATA[
+		if($this->isVisitorMobile()) {
+			$this->language->load('omf/common');
+			$this->data['text_discount_th'] = $this->language->get('text_discount_th');
+		}
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/controller/product/category.php">
+		<operation>
+			<search position="replace" regex="true"><![CDATA[
+			~\$this\-\>data\['thumb'\] = \$this\-\>model_tool_image\-\>resize\(\$(\w*)_info\['image'\], \$this\-\>config->get\('config_image_(\w*)_width'\), \$this\-\>config\-\>get\('config_image_(\w*)_height'\)\);~
+			]]></search>
+			<add><![CDATA[
+			if($this->isVisitorMobile()) {
+				$resolution = getResolution();
+				$this->data['thumb'] = $this->model_tool_image->resize($$1_info['image'], $resolution, $resolution, 'r');
+			} else {
+				$this->data['thumb'] = $this->model_tool_image->resize($$1_info['image'], $this->config->get('config_image_$2_width'), $this->config->get('config_image_$3_height'));
+			}
+			]]></add>
+		</operation>
+
+		<operation>
+			<search position="after"><![CDATA[
+			'price'       => $price,
+			]]></search>
+			<add><![CDATA[
+			'out_of_stock'   => ($result['quantity'] <=0 && $this->config->get('config_disable_addtocart_outofstock')) ? true : false,
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/controller/product/search.php">
+		<operation>
+			<search position="after"><![CDATA[
+			'price'       => $price,
+			]]></search>
+			<add><![CDATA[
+			'out_of_stock'   => ($result['quantity'] <=0 && $this->config->get('config_disable_addtocart_outofstock')) ? true : false,
+			]]></add>
+		</operation>
+	</file>
+
+
+<!-- 	*********************************************************
+			Checkout
+		********************************************************* -->
+
+	<file name="catalog/controller/checkout/cart.php">
+		<operation error="skip">
+			<search position="after"><![CDATA[$this->data['button_reward']]></search>
+			<add><![CDATA[
+			if($this->isVisitorMobile()) {
+				$this->language->load('omf/common');
+				$this->data['button_apply'] = $this->language->get('button_apply');
+				$this->data['direction'] = $this->language->get('direction');
+			}	]]></add>
+		</operation>
+		
+		<operation error="skip"> <!-- Pretty images on retina displays v.1.5.2+ -->
+            <search><![CDATA[
+            $image = $this->model_tool_image->resize($product['image'], $this->config->get('config_image_cart_width'), $this->config->get('config_image_cart_height'));
+            ]]></search>
+            <add><![CDATA[
+				if($this->isVisitorMobile()) {
+						$resolution = getResolution();
+						$image = $this->model_tool_image->resize($product['image'], $resolution/2, $resolution/2);
+				}else {
+						$image = $this->model_tool_image->resize($product['image'], $this->config->get('config_image_cart_width'), $this->config->get('config_image_cart_height'));
+				}
+	            ]]></add>
+	    </operation>
+
+		<operation error="skip"> <!-- Pretty images on retina displays < v.1.5.2 -->
+            <search><![CDATA[
+			$image = $this->model_tool_image->resize($result['image'], $this->config->get('config_image_cart_width'), $this->config->get('config_image_cart_height'));
+            ]]></search>
+            <add><![CDATA[
+				if($this->isVisitorMobile()) {
+						$resolution = getResolution();
+						$image = $this->model_tool_image->resize($result['image'], $resolution/2, $resolution/2);
+				}else {
+						$image = $this->model_tool_image->resize($result['image'], $this->config->get('config_image_cart_width'), $this->config->get('config_image_cart_height'));
+				}
+	            ]]></add>
+	    </operation>
+	</file>
+
+	<file name="catalog/controller/checkout/confirm.php">
+  		<operation error="skip">
+			<search position="after"><![CDATA[
+			$this->data['column_total'] = $this->language->get('column_total');
+			]]></search>
+			<add><![CDATA[
+			if ($this->isVisitorMobile()) {
+				$this->language->load('product/product');
+				$this->data['text_qty'] = str_replace(':', '', $this->language->get('text_qty'));
+			}]]>
+			</add>
+		</operation>
+	</file>
+
+
+<!-- 	*********************************************************
+			Account
+		*********************************************************
+-->
+
+	<file name="catalog/controller/account/wishlist.php">
+		<operation error="skip">
+            <search><![CDATA[
+			$image = $this->model_tool_image->resize($product_info['image'], $this->config->get('config_image_wishlist_width'), $this->config->get('config_image_wishlist_height'));
+            ]]></search>
+            <add><![CDATA[
+				if($this->isVisitorMobile()) {
+						$resolution = getResolution();
+						$image = $this->model_tool_image->resize($product_info['image'], $resolution/2, $resolution/2);
+				}else {
+						$image = $this->model_tool_image->resize($product_info['image'], $this->config->get('config_image_wishlist_width'), $this->config->get('config_image_wishlist_height'));
+				}
+	            ]]></add>
+	    </operation>
+	</file>
+
+
+<!-- 	*********************************************************
+			Misc
+		********************************************************* -->
+
+	<file name="catalog/controller/module/*.php">
+		<operation error="skip">
+			<search position="replace" regex="true"><![CDATA[
+			~\$image = \$this\-\>model_tool_image\-\>resize\(\$(\w*)\['image'\], \$setting\['image_width'\], \$setting\['image_height'\]\);~
+			]]></search>
+			<add><![CDATA[
+				if($this->isVisitorMobile()) {
+						$resolution = getResolution();
+						$resolution = $resolution/2;
+						$image = $this->model_tool_image->resize($$1['image'], $resolution, $resolution);
+				} else {
+						$image = $this->model_tool_image->resize($$1['image'], $setting['image_width'], $setting['image_height']);
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/view/theme/*/template/common/footer.tpl">
+		<operation error="skip">
+			<search position="after">
+			<![CDATA[<div id="powered"> ]]>
+			</search>
+			<add><![CDATA[
+			<span id="switch_mobile"><?php echo $text_view; ?> <a href="<?php if (strpos($_SERVER['QUERY_STRING'], 'view=desktop') === false) {
+									echo $_SERVER['REQUEST_URI'] . (empty($_SERVER['QUERY_STRING']) ? '?view=mobile' : '&view=mobile');
+								} else {
+									echo str_replace('view=desktop', 'view=mobile', $_SERVER['REQUEST_URI']);
+								} ?>" rel="nofollow"><?php echo $text_mobile; ?></a> / <?php echo $text_standard; ?></span>
+			]]></add>
+		</operation>
+
+		<operation error="skip"> <!-- This puts the "View mobile switch on the shoppica theme -->
+			<search position="after">
+			<![CDATA[<p id="copy"> ]]>
+			</search>
+			<add><![CDATA[
+			<span id="switch_mobile"><?php echo $text_view; ?> <a href="<?php echo str_replace('view=desktop', '', $_SERVER['REQUEST_URI']) . (empty($_SERVER['QUERY_STRING']) ? 'index.php?' : '&');?>view=mobile" rel="nofollow"><?php echo $text_mobile; ?></a> / <?php echo $text_standard; ?></span>
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/view/theme/*/template/checkout/checkout.tpl">
+		<operation error="skip">
+			<search position="after" offset="2"><![CDATA[
+			if (json['error']['confirm']) {
+			]]></search>
+			<add><![CDATA[
+			var error = document.getElementsByClassName("error")[0];
+			if (error) {
+				if (error.previousSibling.tagName !== "INPUT" && error.previousSibling.tagName !== "SELECT") {
+					error.previousSibling.previousSibling.previousSibling.focus();
+				} else {
+					error.previousSibling.focus();
+				}
+			}
+			]]></add>
+		</operation>
+
+		<operation error="skip">
+			<search position="after" offset="2" index="2,3,4,5"><![CDATA[
+			if (json['error']['zone']) {
+			]]></search>
+			<add><![CDATA[
+			var error = document.getElementsByClassName("error")[0];
+			if (error) {
+				if (error.previousSibling.tagName !== "INPUT" && error.previousSibling.tagName !== "SELECT") {
+					error.previousSibling.previousSibling.previousSibling.focus();
+				} else {
+					error.previousSibling.focus();
+				}
+			}
+			]]></add>
+		</operation>
+
+		<operation error="skip">
+			<search position="after" index="6"><![CDATA[
+			$('#payment-address .checkout-content').slideUp('slow');
+			]]></search>
+			<add><![CDATA[
+			$('#shipping-address .checkout-content').slideUp('slow');
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/view/theme/*/template/product/category.tpl">
+		<operation>
+			<search position="replace"><![CDATA[
+			<input type="button" value="<?php echo $button_cart; ?>" onclick="addToCart('<?php echo $product['product_id']; ?>');" class="button" />
+			]]></search>
+			<add><![CDATA[
+			<input type="button" value="<?php echo $button_cart; ?>" onclick="addToCart('<?php echo $product['product_id']; ?>');" class="button" <?php if ($product['out_of_stock']) { echo 'disabled="disabled"'; } ?>/>
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/view/theme/*/template/product/search.tpl">
+		<operation>
+			<search position="replace"><![CDATA[
+			<input type="button" value="<?php echo $button_cart; ?>" onclick="addToCart('<?php echo $product['product_id']; ?>');" class="button" />
+			]]></search>
+			<add><![CDATA[
+			<input type="button" value="<?php echo $button_cart; ?>" onclick="addToCart('<?php echo $product['product_id']; ?>');" class="button" <?php  if ($product['out_of_stock']) { echo 'disabled="disabled"'; } ?>/>
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/model/tool/image.php">
+		<operation error="skip">
+			<search position="replace"><![CDATA[
+			public function resize($filename, $width, $height) {
+			]]></search>
+			<add><![CDATA[
+			//OMF proper responsive scalling without BG
+			public function resize($filename, $width, $height, $type = '') {
+			//End OMF
+			]]></add>
+		</operation>
+
+		<operation error="skip">
+			<search position="replace" regex="true"><![CDATA[
+			~\$new_image = 'cache\/' . (\w*)substr\(\$filename, 0, (\w*)strrpos\(\$filename, '\.'\)\) \. '\-' . \$width \. 'x' . \$height \. '\.' \. \$extension;~
+			]]></search>
+			<add><![CDATA[
+			//OMF proper responsive scalling without BG
+			$new_image = 'cache/' . utf8_substr($filename, 0, utf8_strrpos($filename, '.')) . '-' . $width . 'x' . $height . $type .'.' . $extension;
+			//End OMF
+			]]></add>
+		</operation>
+
+		<operation error="skip">
+			<search position="replace"><![CDATA[
+			$image->resize($width, $height);
+			]]></search>
+			<add><![CDATA[
+			//OMF proper responsive scalling without BG
+			$image->resize($width, $height, $type);
+			//End OMF
+			]]></add>
+		</operation>
+	</file>
+	
+	<file name="catalog/view/theme/*/template/onecheckout/checkout.tpl">
+		<operation error="skip">
+			<search position="replace"><![CDATA[
+			<div class="onecheckoutmid">
+			]]></search>
+			<add><![CDATA[
+			<?php if($this->isVisitorMobile()) { ?>
+			  <div class="onecheckoutmid_mobile">
+			<?php }else { ?>
+			  <div class="onecheckoutmid">
+			<?php } ?>
+			]]></add>
+		</operation>
+		
+		<operation error="skip">
+			<search position="replace"><![CDATA[
+			<div class="onecheckout">
+			]]></search>
+			<add><![CDATA[
+			<?php if($this->isVisitorMobile()) { ?>
+			  <div class="onecheckout_mobile">
+			<?php }else { ?>
+			  <div class="onecheckout">
+			<?php } ?>
+			]]></add>
+		</operation>
+	</file>
+    
+</modification>
